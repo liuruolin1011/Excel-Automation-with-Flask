@@ -2,8 +2,6 @@ import win32com.client as win32
 import os
 
 def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, pt_fields, pivot_position):
-    win32c = win32.constants
-    existing_tables = pt_ws.PivotTables().Count
 
     # Adjust starting location based on pivot_position
     if pivot_position == 1:  # First pivot table
@@ -17,9 +15,6 @@ def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, 
 
     pt_cache = wb.PivotCaches().Create(SourceType=win32c.xlDatabase, SourceData=ws1.UsedRange)
     pt_cache.CreatePivotTable(TableDestination=f'{ws_name}!{pt_loc}', TableName=pt_name)
-    
-    pt_ws.Select()
-    eval(f"pt_ws.Cells{pt_loc}.Select()")
 
     for field_list, field_r in ((pt_filters, win32c.xlPageField), (pt_rows, win32c.xlRowField), (pt_cols, win32c.xlColumnField)):
         for i, value in enumerate(field_list):
@@ -33,11 +28,6 @@ def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, 
     pt_ws.PivotTables(pt_name).ShowValuesRow = True
     pt_ws.PivotTables(pt_name).ColumnGrand = True
 
-# Assume the rest of the script sets up the Excel environment and calls pivot_table appropriately
-# When calling pivot_table, the 'pivot_position' argument should be passed to control the position:
-# Example call for the first pivot table:
-# pivot_table(wb, ws1, ws2, ws2_name, pt_name_1, pt_rows_1, pt_cols_1, pt_filters_1, pt_fields_1, 1, debug=True)
-# And so on for the other pivot tables with the appropriate pivot_position (2, 3, 4) based on their desired locations.
 
 def run_excel(filename):
     """
