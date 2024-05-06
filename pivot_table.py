@@ -24,7 +24,16 @@ def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, 
     for field in pt_fields:
         pt_ws.PivotTables(pt_name).AddDataField(pt_ws.PivotTables(pt_name).PivotFields(field[0]),
                                                 field[1], field[2]).NumberFormat = field[3]
+    
+    # Add CalculatedFields to get monthly average amount for value and volume
+    pt_table.CalculatedFields().Add('Monthly Average Value', "='TRXN_BASE_AM' / 12", True)
+    pt_table.PivotFields('Monthly Average Value').Orientation = win32c.xlDataField
+    pt_table.PivotFields('Monthly Average Value').NumberFormat = '$#,##0.00'
 
+    pt_table.CalculatedFields().Add('Monthly Average Volume', "='Column 1' / 12", True)
+    pt_table.PivotFields('Monthly Average Volume').Orientation = win32c.xlDataField
+    pt_table.PivotFields('Monthly Average Volume').NumberFormat = '#,##0.00'
+    
     pt_ws.PivotTables(pt_name).ShowValuesRow = True
     pt_ws.PivotTables(pt_name).ColumnGrand = True
 
