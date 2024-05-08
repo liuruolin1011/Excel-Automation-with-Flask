@@ -87,6 +87,5 @@ def run_excel(filename):
     return output_file
 
 if __name__ == '__main__':
-    filename = r'D:\temp\OUTPUT.xlsx'
     output_file = run_excel(filename)
     print(f"Pivot tables saved in: {output_file}")
