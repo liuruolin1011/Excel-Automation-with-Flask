@@ -20,7 +20,7 @@ def date_input():
 
     global data
     # Update the file every month
-    filepath= r'\\9ushsnybfls102\usa_all$\Limited Authorized Access Folders\LCD\KYC Repapering Project\Transaction for all Customer\cif_all_trxn_202404_1.csv'
+    filepath= r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_1.csv'
 
     filename =os.path.basename(filepath)
     filename_pattern = re.compile(r'_(\d{4})(\d{2})_')
@@ -33,8 +33,7 @@ def date_input():
 
     return render_template('date_input.html', year = year, month = month)
 
-dirpath_dst = r'C:\Users\RUOLINLIU\Desktop\Transaction Pivot\May 2024' # where the file saved on local of Ruolin's computer
-# dirpath_dst = r'D:\tasks\EDD_transactions' # where the file saved on local when Brad is hosting the link
+dirpath_dst = r'C:\Users\Desktop\Transaction Pivot\May 2024' 
 
 @app.route('/completed', methods=['GET', 'POST'])
 
@@ -45,8 +44,8 @@ def call_another_script():
     CIFs = request.form.get('CIFs')
 
     # Update the file every month
-    filepath1 = r'\\9ushsnybfls102\usa_all$\Limited Authorized Access Folders\LCD\KYC Repapering Project\Transaction for all Customer\cif_all_trxn_202404_1.csv'
-    filepath2 = r'\\9ushsnybfls102\usa_all$\Limited Authorized Access Folders\LCD\KYC Repapering Project\Transaction for all Customer\cif_all_trxn_202404_2.csv'
+    filepath1 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_1.csv'
+    filepath2 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_2.csv'
 
     # Convert the string of items to a list
     items_list = [item.strip() for item in re.findall('\d+', CIFs)]
@@ -84,6 +83,4 @@ def download_excel(filename):
 
 
 if __name__ == '__main__':
-    # app.run()
-    app.run(debug=True, host='22.232.100.153', port=5000) # Ruolin
-    # app.run(debug=True, host='21.232.104.67', port=5013) # Brad
+    app.run(debug=True, host='22.222.100.100', port=5013)
