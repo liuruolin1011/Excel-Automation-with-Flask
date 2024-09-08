@@ -1,17 +1,21 @@
 import win32com.client as win32
 import os
 
-def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, pt_fields, pivot_position):
+def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, pt_fields, pivot_position, custom_etext, fill_color):
 
     # Adjust starting location based on pivot_position
     if pivot_position == 1:  # First pivot table
-        pt_loc = 'R1C1'
+        pt_loc = 'R2C2'
+        filter_start_cell = 'B2'
     elif pivot_position == 2:  # Right of the first pivot table, assuming first pivot is about 5 columns wide
-        pt_loc = 'R1C6'
+        pt_loc = 'R2C8'
+        filter_start_cell = 'H2'
     elif pivot_position == 3:  # Below the first pivot table, assuming first pivot is about 15 rows tall
-        pt_loc = 'R16C1'
+        pt_loc = 'R20C2'
+        filter_start_cell = 'B19'
     elif pivot_position == 4:  # Right of the third pivot table, assuming third pivot is about 5 columns wide
-        pt_loc = 'R16C6'
+        pt_loc = 'R20C8'
+        filter_start_cell = 'H19'
 
     pt_cache = wb.PivotCaches().Create(SourceType=win32c.xlDatabase, SourceData=ws1.UsedRange)
     pt_cache.CreatePivotTable(TableDestination=f'{ws_name}!{pt_loc}', TableName=pt_name)
@@ -37,6 +41,17 @@ def pivot_table(wb, ws1, pt_ws, ws_name, pt_name, pt_rows, pt_cols, pt_filters, 
     pt_ws.PivotTables(pt_name).ShowValuesRow = True
     pt_ws.PivotTables(pt_name).ColumnGrand = True
 
+    filter_text_cell = pt_ws.Range(filter_start_cell)
+    filter_text_cell.Offset(1,1).Value = custom_text
+    merged_range = pt_ws.Range(filter_text_cell.Offset(1,1), filter_text_cell.Offset(1,5))
+    merged_range.Merge()
+    merged_range.Interior.Color = fill_color
+
+    merged_range.Font.Bold = True
+
+    merged_range.HorizontalAlignment = win32c.xlCenter
+    merged_range.VerticalAlignment = win32c.xlCenter
+    
 
 def run_excel(filename):
     """
@@ -63,7 +78,7 @@ def run_excel(filename):
     pt_filters_1 = ['CUST_INTRL_ID']
     pt_fields_1 = [['TRXN_BASE_AM', 'Value', win32.constants.xlSum, '$#,##0.00'],
                    ['FO_TRXN_SEQ_ID', 'Volume', win32.constants.xlCount, '0']]
-    pivot_table(wb, ws1, ws2, ws2_name, pt_name_1, pt_rows_1, pt_cols_1, pt_filters_1, pt_fields_1, 1)
+    pivot_table(wb, ws1, ws2, ws2_name, pt_name_1, pt_rows_1, pt_cols_1, pt_filters_1, pt_fields_1, 1, 'Expected Transaction Activity')
     
     # Second Pivot Table
     ws3 = wb.Sheets('Actual Transaction')
@@ -73,7 +88,7 @@ def run_excel(filename):
     pt_filters_2 = ['CUST_INTRL_ID']
     pt_fields_2 = [['TRXN_BASE_AM', 'Value', win32.constants.xlSum, '$#,##0.00'],
                    ['FO_TRXN_SEQ_ID', 'Volume', win32.constants.xlCount, '0']]
-    pivot_table(wb, ws3, ws2, ws2_name, pt_name_2, pt_rows_2, pt_cols_2, pt_filters_2, pt_fields_2, 2)
+    pivot_table(wb, ws3, ws2, ws2_name, pt_name_2, pt_rows_2, pt_cols_2, pt_filters_2, pt_fields_2, 2, 'Actual Transaction Activity)
 
     # Third Pivot Table
 
