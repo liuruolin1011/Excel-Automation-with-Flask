@@ -17,21 +17,25 @@ data = {
 @app.route('/', methods=['GET', 'POST'])
 
 def date_input():
+    available_years = ['2021','2022','2023','2024','2025']
+    available_months = {'01': 'January',
+                        '02': 'February',
+                        '03': 'March',
+                        '04': 'April',
+                        '05': 'May',
+                        '06': 'June',
+                        '07': 'July',
+                        '08': 'August',
+                        '09': 'September',
+                        '10': 'October',
+                        '11': 'November',
+                        '12': 'December'}
+    if request.method == 'POST':
+        selected_year = request.form.get('year')
+        selected_month = request.form.get('month')
+        return f"Selected Year: {selected_year}, Selected Month: {available_months[selected_month]}"
 
-    global data
-    # Update the file every month
-    filepath= r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_1.csv'
-
-    filename =os.path.basename(filepath)
-    filename_pattern = re.compile(r'_(\d{4})(\d{2})_')
-    match = filename_pattern.search(filename)
-
-    # Extract the year and month from the matched groups
-    if match:
-        year = match.group(1)
-        month = match.group(2)
-
-    return render_template('date_input.html', year = year, month = month)
+    return render_template('date_input.html', available_years=available_years, available_months=availble_months)
 
 dirpath_dst = r'C:\Users\Desktop\Transaction Pivot\May 2024' 
 
@@ -42,10 +46,12 @@ def call_another_script():
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
     CIFs = request.form.get('CIFs')
+    target_month = request.form.get('target_month')
+    target_year = request.form.get('target_year')
 
     # Update the file every month
-    filepath1 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_1.csv'
-    filepath2 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_2024_04_2.csv'
+    filepath1 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_{target_year}{target_month}_1.csv'
+    filepath2 = r'\\C:\Users\Desktop\Transaction Data\transaction_data_{target_year}{target_month}_2.csv'
 
     # Convert the string of items to a list
     items_list = [item.strip() for item in re.findall('\d+', CIFs)]
@@ -58,11 +64,13 @@ def call_another_script():
     filename = process_data(data['start_date'], data['end_date'], data['cifs'], filepath1, filepath2, dirpath_dst)
 
     pythoncom.CoInitialize() # https://stackoverflow.com/questions/26745617/win32com-client-dispatch-cherrypy-coinitialize-has-not-been-called
-
-    filepath = os.path.join(dirpath_dst, filename)
-    filename = run_excel(filepath)
-    
+    try:
+        filepath = os.path.join(dirpath_dst, filename)
+        filename = run_excel(filepath)
+    finally:
+        pythoncom.CoUninitialize()
     return render_template('result.html', ext_filename=filename, data=data)
+    
 
 @app.route('/<filename>')
 
@@ -76,11 +84,9 @@ def download_excel(filename):
 
     if os.path.exists(filepath):
         print("Path found")
-    
         return send_file(filepath, as_attachment=True)
     else:
         return f"File '{filepath}' not found in the current working directory."
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='22.222.100.100', port=5013)
