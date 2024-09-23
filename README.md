@@ -1,3 +1,3 @@
 Data ETL
-Web Development
-Excel Pivot Automation
+Web Development with Flask
+Excel Pivot Automation with win32com
