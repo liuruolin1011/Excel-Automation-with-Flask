@@ -4,6 +4,11 @@ from transactions import process_data
 from pivot import run_excel
 import re
 import pythoncom
+import socket
+
+debug = False
+host = socket.gethostname(socket.gethostname())
+port = 5000
 
 app = Flask(__name__)
 
@@ -89,4 +94,4 @@ def download_excel(filename):
         return f"File '{filepath}' not found in the current working directory."
 
 if __name__ == '__main__':
-    app.run(debug=True, host='00.000.000.000', port=8000)
+    app.run(debug=True, host=host, port=port)
